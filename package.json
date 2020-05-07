@@ -1,0 +1,38 @@
+{
+  "name": "monitor-kweb",
+  "version": "1.0.0",
+  "description": "Monitor de estado de K-Web de Knapp",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "test": "nodemon index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/AlejandroAbad/monitor-kweb.git"
+  },
+  "keywords": [
+    "kweb",
+    "k-web",
+    "knapp",
+    "klass-x"
+  ],
+  "author": "Alejandro Abad",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/AlejandroAbad/monitor-kweb/issues"
+  },
+  "homepage": "https://github.com/AlejandroAbad/monitor-kweb#readme",
+  "devDependencies": {
+    "nodemon": "^2.0.3"
+  },
+  "dependencies": {
+    "app-module-path": "^2.2.0",
+    "cors": "^2.8.5",
+    "dateformat": "^3.0.3",
+    "express": "^4.17.1",
+    "locks": "^0.2.2",
+    "request": "^2.88.2",
+    "saslprep": "^1.0.3"
+  }
+}

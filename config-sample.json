@@ -1,0 +1,13 @@
+{
+	"http": {
+		"puerto": 8088
+	},
+	"destinos": {
+		"madrid": {
+			"urlBase": "http://10.1.11.1:8080/kweb",
+			"usuario": "usuarioKweb",
+			"password": "ketefó",
+			"tipo": 6
+		}
+	}
+}
