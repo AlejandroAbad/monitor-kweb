@@ -4,7 +4,7 @@
   "description": "Monitor de estado de K-Web de Knapp",
   "main": "index.js",
   "scripts": {
-    "start": "node index.js",
+    "start": "nohup node index.js >~/console.log 2>~/console.err &",
     "test": "nodemon index.js"
   },
   "repository": {
