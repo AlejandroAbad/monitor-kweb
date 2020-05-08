@@ -11,15 +11,24 @@ const tryCatch = require('routes/tryCatchWrapper');
 module.exports = (app) => {
 
 	const controladores = {
-		destinos: require('controllers/controladorConsultaDestinos')
+		destinos: require('controllers/controladorConsultaDestinos'),
+		filesystems: require('controllers/controladorFilesystems')
 	}
 
 
-	// Destinos
+	// Destinoss
 	app.route('/destinos')
 		.get(tryCatch(controladores.destinos.listadoDestinosKweb));
 	app.route('/destinos/:nombreDestino')
 		.get(tryCatch(controladores.destinos.consultaDestinoKweb));
+
+
+	// Filesystems
+	app.route('/:nombreDestinoKweb/filesystems')
+		.get(tryCatch(controladores.filesystems.consultaFilesystems));
+
+	app.route('/prtg/:nombreDestinoKweb/filesystems')
+		.get(tryCatch(controladores.filesystems.consultaFilesystemsPRTG));
 
 
 
