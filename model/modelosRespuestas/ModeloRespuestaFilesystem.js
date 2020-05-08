@@ -42,7 +42,7 @@ class RespuestaFilesystem {
 			},
 			{
 				"Channel": "Bytes total en " + this.puntoMontaje,
-				"Value": this.espacioTota,
+				"Value": this.espacioTotal,
 				"Unit": "BytesDisk"
 			}
 		]
