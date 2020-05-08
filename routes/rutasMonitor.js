@@ -12,11 +12,12 @@ module.exports = (app) => {
 
 	const controladores = {
 		destinos: require('controllers/controladorConsultaDestinos'),
-		filesystems: require('controllers/controladorFilesystems')
+		filesystems: require('controllers/controladorFilesystems'),
+		tablespaces: require('controllers/controladorTablespaces')
 	}
 
 
-	// Destinoss
+	// Destinos
 	app.route('/destinos')
 		.get(tryCatch(controladores.destinos.listadoDestinosKweb));
 	app.route('/destinos/:nombreDestino')
@@ -29,6 +30,14 @@ module.exports = (app) => {
 
 	app.route('/prtg/:nombreDestinoKweb/filesystems')
 		.get(tryCatch(controladores.filesystems.consultaFilesystemsPRTG));
+
+
+	// Tablespaces
+	app.route('/:nombreDestinoKweb/tablespaces')
+		.get(tryCatch(controladores.tablespaces.consultaTablespaces));
+
+	app.route('/prtg/:nombreDestinoKweb/tablespaces')
+		.get(tryCatch(controladores.tablespaces.consultaTablespacesPRTG));
 
 
 
