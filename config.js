@@ -18,7 +18,7 @@ const verificarDestinosKweb = (config) => {
 };
 
 const verificarDestinoKweb = (kweb) => {
-	return (kweb.urlBase && kweb.usuario && kweb.password && kweb.tipo);
+	return (kweb.urlBase && kweb.usuario && kweb.password && kweb.versionKnapp);
 };
 
 const verificarHttp = (config) => {

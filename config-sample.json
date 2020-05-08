@@ -7,7 +7,7 @@
 			"urlBase": "http://10.1.11.1:8080/kweb",
 			"usuario": "usuarioKweb",
 			"password": "ketefó",
-			"tipo": 6
+			"versionKnapp": 6
 		}
 	}
 }
