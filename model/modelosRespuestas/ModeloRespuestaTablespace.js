@@ -11,7 +11,11 @@ class RespuestaTablespaces {
 	 * Group 4.		0
 	 * Group 5.		2
 	 * Group 6.		0
-	 * Group 7.		NO
+	 * Group 7.		NO|YES
+	 * 
+	 * Nota: porcentajeUso es el espacio RECLAMADO usado. Si autoextend = OFF, este es el porcentaje de uso.
+	 * Cuando autoextend está activado, deberemos usar porcentajeMaximoUso - ya es el porcentaje de espacio usado con respecto al máximo que puede llegar a crecer el tablespace.
+	 * 
 	 * @param {*} match 
 	 */
 	constructor(match) {
@@ -21,7 +25,7 @@ class RespuestaTablespaces {
 		this.espacioMaximo = parseInt(match[4].replace(/\./g, ''));
 		this.porcentajeUso = parseInt(match[5]);
 		this.porcentajeMaximoUso = parseInt(match[6]);
-		this.autoextend = (match[7] === 'Nein') ? false : true;
+		this.autoextend = (match[7] === 'NO') ? false : true;
 	}
 
 
@@ -29,10 +33,10 @@ class RespuestaTablespaces {
 		return [
 			{
 				"Channel": this.nombre,
-				"Value": this.porcentajeUso,
+				"Value": this.autoextend ? this.porcentajeMaximoUso : this.porcentajeUso,
 				"LimitMode": 1,
 				"Unit": "Percent",
-				"LimitMaxError": this.porcentajeMaximoUso || 90
+				"LimitMaxError": 90
 			}
 		]
 	}
