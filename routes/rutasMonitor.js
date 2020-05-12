@@ -16,6 +16,9 @@ module.exports = (app) => {
 		tablespaces: require('controllers/controladorTablespaces'),
 		estaciones: require('controllers/controladorEstaciones'),
 		tablas: require('controllers/controladorTablas'),
+		canales: require('controllers/controladorCanales'),
+		procesos: require('controllers/controladorProcesos'),
+		tareas: require('controllers/controladorTareas')
 	}
 
 
@@ -57,6 +60,29 @@ module.exports = (app) => {
 	app.route('/prtg/:nombreDestinoKweb/tablas')
 		.get(tryCatch(controladores.tablas.consultaTablasPRTG));
 
+
+	// Canales
+	app.route('/:nombreDestinoKweb/canales')
+		.get(tryCatch(controladores.canales.consultaCanales));
+
+	app.route('/prtg/:nombreDestinoKweb/canales')
+		.get(tryCatch(controladores.canales.consultaCanalesPRTG));
+
+
+	// Procesos
+	app.route('/:nombreDestinoKweb/procesos')
+		.get(tryCatch(controladores.procesos.consultaProcesos));
+
+	app.route('/prtg/:nombreDestinoKweb/procesos')
+		.get(tryCatch(controladores.procesos.consultaProcesosPRTG));
+
+
+	// Tareas
+	app.route('/:nombreDestinoKweb/tareas')
+		.get(tryCatch(controladores.tareas.consultaTareas));
+
+	app.route('/prtg/:nombreDestinoKweb/tareas')
+		.get(tryCatch(controladores.tareas.consultaTareasPRTG));
 
 	/* Middleware que se ejecuta tras no haberse hecho matching con ninguna ruta. */
 	app.use((req, res, next) => {
