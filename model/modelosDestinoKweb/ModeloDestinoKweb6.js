@@ -9,20 +9,25 @@ const request = require('request')
 const RespuestaFilesystem = require('model/modelosRespuestas/ModeloRespuestaFilesystem');
 const RespuestaTablespace = require('model/modelosRespuestas/ModeloRespuestaTablespace');
 const RespuestaEstacion = require('model/modelosRespuestas/ModeloRespuestaEstacion');
+const RespuestaTabla = require('model/modelosRespuestas/ModeloRespuestaTabla');
 
 
 const ENDPOINTS = {
 	AUTH: '/kweb/auth',
 	FILESYSTEMS: '/kweb/agents/page?kweb:agents.disks_expanded=true#kweb_agents_disks',
 	TABLESPACES: '/kweb/agents/page?kweb:agents.oracletablespaces_expanded=true#kweb_agents_oracletablespaces',
-	ESTACIONES: '/kweb/agents/page?kweb:agents.stations_expanded=true#kweb_agents_stations'
+	ESTACIONES: '/kweb/agents/page?kweb:agents.stations_expanded=true#kweb_agents_stations',
+	TABLAS: '/kweb/agents/page?kweb:agents.dbmtables_expanded=true#kweb_agents_dbmtables'
 }
+
+
 
 const REGEX = {
 	TITULO_LOGIN: /<title>(.*)LOGIN/,
 	FILESYSTEMS: /<tr [a-zA-Z0-9=\'\"\:\s\.\_\/]*><td [a-zA-Z0-9=\'\"\:\s\.\_\/]*><img [a-zA-Z0-9=\'\"\:\s\.\_\/]*><img src=\"\/kweb\/img\/ico\-([a-zA-Z0-9\/\-\.]*)\.gif\" [a-zA-Z0-9=\'\"\:\s\.\_\/]*><\/td><td [a-zA-Z0-9=\'\"\:\s\.\_\/]*><span>([a-zA-z0-9\/\_]*)<\/span><\/td><td [a-zA-Z0-9=\'\"\:\s\.\_\/]*><span>([0-9]*)<\/span><\/td><td [a-zA-Z0-9=\'\"\:\s\.\_\/]*><span>([0-9]*)<\/span><\/td><td [a-zA-Z0-9=\'\"\:\s\.\_\/]*><span>([0-9]*)<\/span><\/td><td [a-zA-Z0-9=\'\"\:\s\.\_\/]*><div [a-zA-Z0-9=\'\"\:\s\.\_\/]*>([0-9]*)%<\/div><\/td><td [a-zA-Z0-9=\'\"\:\s\.\_\/]*><div [a-zA-Z0-9=\'\"\:\s\.\_\/]*>([0-9]*)%<\/div><\/td><\/tr>/g,
 	TABLESPACES: /<tr [a-zA-Z0-9=\'\"\:\s\.\_\/]*><td [a-zA-Z0-9=\'\"\:\s\.\_\/]*><img [a-zA-Z0-9=\'\"\:\s\.\_\/]*><img src=\"\/kweb\/img\/ico\-([a-zA-Z0-9\/\-\.]*)\.gif\" [a-zA-Z0-9=\'\"\:\s\.\_\/]*><\/td><td [a-zA-Z0-9=\'\"\:\s\.\_\/]*><span>\*([a-zA-z0-9\/\_]*)<\/span><\/td><td [a-zA-Z0-9=\'\"\:\s\.\_\/]*><div [a-zA-Z0-9=\'\"\:\s\.\_\/]*>([0-9\.]*)<\/div><\/td><td [a-zA-Z0-9=\'\"\:\s\.\_\/]*><div [a-zA-Z0-9=\'\"\:\s\.\_\/]*>([0-9\.]*)<\/div><\/td><td [a-zA-Z0-9=\'\"\:\s\.\_\/]*><div [a-zA-Z0-9=\'\"\:\s\.\_\/]*>([0-9\.]*)%<\/div><\/td><td [a-zA-Z0-9=\'\"\:\s\.\_\/]*><div [a-zA-Z0-9=\'\"\:\s\.\_\/]*>([0-9\.]*)%<\/div><\/td><td [a-zA-Z0-9=\'\"\:\s\.\_\/]*><span>([a-zA-Z0-9]*)<\/span><\/td><\/tr>/g,
 	ESTACIONES: /<tr [a-zA-Z0-9=\'\"\:\s\.\_\/]*><td [a-zA-Z0-9=\'\"\:\s\.\_\/]*><img [a-zA-Z0-9=\'\"\:\s\.\_\/]*><img src=\"\/kweb\/img\/ico\-([a-zA-Z0-9\/\-\.]*)\.gif\" [a-zA-Z0-9=\'\"\:\s\.\_\/]*><\/td><td [a-zA-Z0-9=\'\"\:\s\.\_\/]*><span>([a-zA-z0-9]*)<\/span><\/td><td [a-zA-Z0-9=\'\"\:\s\.\_\/]*><span>([a-zA-z0-9\s]*)<\/span><\/td><td [a-zA-Z0-9=\'\"\:\s\.\_\/]*><div [a-zA-Z0-9=\'\"\:\s\.\_\/]*>([a-zA-Z0-9\/\_\s]*)<\/div><\/td><\/tr>/g,
+	TABLAS: /<tr [a-zA-Z0-9=\'\"\:\s\.\_\/]*><td [a-zA-Z0-9=\'\"\:\s\.\_\/]*><img [a-zA-Z0-9=\'\"\:\s\.\_\/]*><img src=\"\/kweb\/img\/ico\-([a-zA-Z0-9\/\-\.]*)\.gif\" [a-zA-Z0-9=\'\"\:\s\.\_\/]*><\/td><td [a-zA-Z0-9=\'\"\:\s\.\_\/]*><span>([a-zA-z0-9]*)<\/span><\/td><td [a-zA-Z0-9=\'\"\:\s\.\_\/]*><div [a-zA-Z0-9=\'\"\:\s\.\_\/]*>([0-9\.]*)<\/div><\/td><td [a-zA-Z0-9=\'\"\:\s\.\_\/]*><div [a-zA-Z0-9=\'\"\:\s\.\_\/]*>([0-9\.]*)<\/div><\/td><\/tr>/g,
 }
 
 
@@ -107,7 +112,6 @@ class ModeloDestinoKweb6 {
 		});
 	}
 
-
 	consultaFilesystems(callback) {
 
 		this._renovarCookieAutenticacion((errorAutenticacion, estoyAutenticado) => {
@@ -147,7 +151,6 @@ class ModeloDestinoKweb6 {
 			})
 		})
 	}
-
 
 	consultaTablespaces(callback) {
 
@@ -213,7 +216,6 @@ class ModeloDestinoKweb6 {
 				}
 
 				cuerpoHttp = cuerpoHttp.replace(/\n/g, '');
-				console.log(cuerpoHttp);
 				let match = REGEX.ESTACIONES.exec(cuerpoHttp);
 
 
@@ -227,6 +229,47 @@ class ModeloDestinoKweb6 {
 				}
 
 				callback(null, estaciones);
+			})
+		})
+	}
+
+	consultaTablas(callback) {
+		this._renovarCookieAutenticacion((errorAutenticacion, estoyAutenticado) => {
+			if (errorAutenticacion) {
+				callback(errorAutenticacion, null);
+				return;
+			}
+
+			let parametrosLlamada = this._generarParametrosDeLlamada(ENDPOINTS.TABLAS);
+
+			request(parametrosLlamada, (errorLlamada, respuestaHttp, cuerpoHttp) => {
+
+				if (errorLlamada) {
+					L.e(['Ocurrió un error en la llamada al sistema Kweb', errorLlamada]);
+					callback(errorLlamada, null);
+					return;
+				}
+
+				if (respuestaHttp.statusCode !== 200) {
+					L.e(['La llamada no retornó un codigo de respuesta HTTP 200', respuestaHttp.statusCode]);
+					callback(new Error('KWeb retornó un error de respuesta: ' + respuestaHttp.statusCode), null);
+					return;
+				}
+
+				cuerpoHttp = cuerpoHttp.replace(/\n/g, '');
+				let match = REGEX.TABLAS.exec(cuerpoHttp);
+
+
+
+				let tablas = [];
+
+				while (match != null) {
+					let respuestaTabla = new RespuestaTabla(match);
+					tablas.push(respuestaTabla);
+					match = REGEX.TABLAS.exec(cuerpoHttp);
+				}
+
+				callback(null, tablas);
 			})
 		})
 	}

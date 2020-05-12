@@ -15,6 +15,7 @@ module.exports = (app) => {
 		filesystems: require('controllers/controladorFilesystems'),
 		tablespaces: require('controllers/controladorTablespaces'),
 		estaciones: require('controllers/controladorEstaciones'),
+		tablas: require('controllers/controladorTablas'),
 	}
 
 
@@ -40,7 +41,7 @@ module.exports = (app) => {
 	app.route('/prtg/:nombreDestinoKweb/tablespaces')
 		.get(tryCatch(controladores.tablespaces.consultaTablespacesPRTG));
 
-		
+
 	// Estaciones
 	app.route('/:nombreDestinoKweb/estaciones')
 		.get(tryCatch(controladores.estaciones.consultaEstaciones));
@@ -48,6 +49,13 @@ module.exports = (app) => {
 	app.route('/prtg/:nombreDestinoKweb/estaciones')
 		.get(tryCatch(controladores.estaciones.consultaEstacionesPRTG));
 
+
+	// Tablas
+	app.route('/:nombreDestinoKweb/tablas')
+		.get(tryCatch(controladores.tablas.consultaTablas));
+
+	app.route('/prtg/:nombreDestinoKweb/tablas')
+		.get(tryCatch(controladores.tablas.consultaTablasPRTG));
 
 
 	/* Middleware que se ejecuta tras no haberse hecho matching con ninguna ruta. */
