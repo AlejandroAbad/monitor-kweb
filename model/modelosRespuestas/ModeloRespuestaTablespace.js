@@ -21,7 +21,7 @@ class RespuestaTablespaces {
 		this.espacioMaximo = parseInt(match[4].replace(/\./g, ''));
 		this.porcentajeUso = parseInt(match[5]);
 		this.porcentajeMaximoUso = parseInt(match[6]);
-		this.autoextend = (match[7] === 'NO') ? false : true;
+		this.autoextend = (match[7] === 'Nein') ? false : true;
 	}
 
 

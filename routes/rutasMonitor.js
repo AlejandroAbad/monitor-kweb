@@ -13,7 +13,8 @@ module.exports = (app) => {
 	const controladores = {
 		destinos: require('controllers/controladorConsultaDestinos'),
 		filesystems: require('controllers/controladorFilesystems'),
-		tablespaces: require('controllers/controladorTablespaces')
+		tablespaces: require('controllers/controladorTablespaces'),
+		estaciones: require('controllers/controladorEstaciones'),
 	}
 
 
@@ -38,6 +39,14 @@ module.exports = (app) => {
 
 	app.route('/prtg/:nombreDestinoKweb/tablespaces')
 		.get(tryCatch(controladores.tablespaces.consultaTablespacesPRTG));
+
+		
+	// Estaciones
+	app.route('/:nombreDestinoKweb/estaciones')
+		.get(tryCatch(controladores.estaciones.consultaEstaciones));
+
+	app.route('/prtg/:nombreDestinoKweb/estaciones')
+		.get(tryCatch(controladores.estaciones.consultaEstacionesPRTG));
 
 
 
