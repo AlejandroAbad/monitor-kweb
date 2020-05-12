@@ -15,14 +15,14 @@ const consultaCanales = (req, res) => {
 	let destinoKweb = DestinoKweb.desdeNombre(nombreDestinoKweb);
 
 	if (!destinoKweb) {
-		L.e('No existe el destino Kweb indicado', nombreDestinoKweb);
+		L.e(['No existe el destino Kweb indicado', nombreDestinoKweb]);
 		res.status(404).json({ ok: false, error: 'No existe el desino Kweb indicado' });
 		return;
 	}
 
 	destinoKweb.consultaCanales((errorConsulta, canales) => {
 		if (errorConsulta) {
-			L.e('Ocurrió un error al consultar los canales', errorConsulta);
+			L.e(['Ocurrió un error al consultar los canales', errorConsulta]);
 			res.status(500).json({ ok: false, error: errorConsulta });
 		} else {
 			res.status(200).json({ ok: true, datos: canales });
@@ -40,7 +40,7 @@ const consultaCanalesPRTG = (req, res) => {
 	let destinoKweb = DestinoKweb.desdeNombre(nombreDestinoKweb);
 
 	if (!destinoKweb) {
-		L.e('No existe el destino Kweb indicado', nombreDestinoKweb);
+		L.e(['No existe el destino Kweb indicado', nombreDestinoKweb]);
 		let errorPRTG = new ErrorPRTG('No existe el destino Kweb indicado')
 		res.status(404).json(errorPRTG.formatoPRTG());
 		return;
@@ -48,7 +48,7 @@ const consultaCanalesPRTG = (req, res) => {
 
 	destinoKweb.consultaCanales((errorConsulta, canales) => {
 		if (errorConsulta) {
-			L.e('Ocurrió un error al consultar los canales', errorConsulta);
+			L.e(['Ocurrió un error al consultar los canales', errorConsulta]);
 			let errorPRTG = new ErrorPRTG(errorConsulta.message)
 			res.status(500).json(errorPRTG.formatoPRTG());
 			return
