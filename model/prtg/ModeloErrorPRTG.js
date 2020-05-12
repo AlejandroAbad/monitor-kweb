@@ -13,7 +13,7 @@ class ErrorPRTG {
 		return {
 			prtg: {
 				error: 1,
-				text: mensaje
+				text: this.mensaje
 			}
 		}
 	}
