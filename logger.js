@@ -1,5 +1,5 @@
 'use strict';
-//const C = global.config;
+const C = global.config;
 let L = {};
 
 const fs = require('fs');
@@ -17,7 +17,7 @@ const FATAL = 'DIE';
 const _obtenerFicheroLog = (timestamp, esParaDump) => {
 	let fecha = Date.toShortDate(timestamp);
 	if (esParaDump) fecha += '.' + Date.toShortTime(timestamp);
-	return './dumps/' + fecha + (esParaDump ? '.dump' : '.log');
+	return C.dumpdir + '/' + fecha + (esParaDump ? '.dump' : '.log');
 }
 
 const grabarLog = (evento) => {

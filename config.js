@@ -50,6 +50,8 @@ try {
 	_verificadorConfiguracion.verificarDestinosKweb(C);
 	_verificadorConfiguracion.verificarHttp(C);
 
+	if (!C.dumpdir) C.dumpdir = './dumps';
+
 } catch (excepcion) {
 	console.error("**** NO SE ENCUENTRA EL FICHERO DE CONFIGURACIÓN O NO ES VÁLIDO");
 	console.error(excepcion);
