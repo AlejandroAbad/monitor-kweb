@@ -17,6 +17,7 @@ const RespuestaTarea = require('model/modelosRespuestas/ModeloRespuestaTarea');
 
 const ENDPOINTS = {
 	AUTH: '/kweb/auth',
+	LOGOUT: '/kweb/auth?action=logout',
 	FILESYSTEMS: '/kweb/agents/page?kweb:agents.disks_expanded=true#kweb_agents_disks',
 	TABLESPACES: '/kweb/agents/page?kweb:agents.oracletablespaces_expanded=true#kweb_agents_oracletablespaces',
 	ESTACIONES: '/kweb/agents/page?kweb:agents.stations_expanded=true#kweb_agents_stations',
@@ -40,6 +41,9 @@ const REGEX = {
 }
 
 
+const CACHE_SESIONES = {};
+
+
 class ModeloDestinoKweb6 {
 	constructor(nombreDestino, configuracionDestino) {
 
@@ -49,6 +53,11 @@ class ModeloDestinoKweb6 {
 		this.urlBase = configuracionDestino.urlBase;
 		this.usuario = configuracionDestino.usuario;
 		this.password = configuracionDestino.password;
+
+		if (CACHE_SESIONES[this.nombre]) {
+			this.cookieSesion = CACHE_SESIONES[this.nombre];
+			L.i(['Recuperada cookie de sesion', this.cookieSesion]);
+		}
 
 	}
 
@@ -81,7 +90,7 @@ class ModeloDestinoKweb6 {
 			uri: this.urlBase + endpoint,
 			method: 'GET',
 			headers: {
-				'Cookie': this.cookieAutenticacion,
+				'Cookie': this.cookieSesion,
 				'Accept': '*/*',
 				'Accept-Enconding': 'gzip, deflate, br',
 				'Connection': 'close'
@@ -89,7 +98,14 @@ class ModeloDestinoKweb6 {
 		}
 	}
 
-	_renovarCookieAutenticacion(callback) {
+	
+	_solicitarCookieAutenticacion(callback) {
+
+		if (this.cookieSesion) {
+			L.i(['Reutilizando cookie', this.cookieSesion]);
+			callback(null, true);
+			return;
+		}
 
 		let parametrosLlamada = this._generarParametrosDeLlamadaAutenticacion();
 
@@ -99,12 +115,14 @@ class ModeloDestinoKweb6 {
 
 			if (errorLlamada) {
 				L.e(['Ocurrió un error en la llamada al sistema Kweb', errorLlamada]);
+				this._hacerLogout();
 				callback(errorLlamada, false);
 				return;
 			}
 
 			if (respuestaHttp.statusCode !== 200) {
 				L.e(['La llamada no retornó un codigo de respuesta HTTP 200', respuestaHttp.statusCode]);
+				this._hacerLogout();
 				callback(new Error('KWeb retornó un error de respuesta: ' + respuestaHttp.statusCode), null);
 				return;
 			}
@@ -113,34 +131,51 @@ class ModeloDestinoKweb6 {
 
 			if (REGEX.TITULO_LOGIN.test(cuerpoHttp)) {
 				L.e(['La llamada no consiguió autenticarse - Credenciales no válidas']);
+				this.cookieSesion = null;
 				callback(new Error('Credenciales incorrectas'), false);
 			} else {
-				this.cookieAutenticacion = respuestaHttp.req.path.substring(7).toUpperCase();
+				this.cookieSesion = respuestaHttp.req.path.substring(7).toUpperCase();
+				CACHE_SESIONES[this.nombre] = this.cookieSesion;
+				L.i(['Se obtiene el cookie de sesión', this.cookieSesion])
 				callback(null, true);
 			}
 		});
 	}
 
+	_hacerLogout() {
+		L.t(['Realizando petición de LOGOUT al sistema Kweb para la sesion', this.cookieSesion]);
+		this.cookieSesion = null;
+		CACHE_SESIONES[this.nombre] = null;
+	}
+
 	consultaFilesystems(callback) {
 
-		this._renovarCookieAutenticacion((errorAutenticacion, estoyAutenticado) => {
+		this._solicitarCookieAutenticacion((errorAutenticacion, estoyAutenticado) => {
 			if (errorAutenticacion) {
 				callback(errorAutenticacion, null);
 				return;
 			}
 
 			let parametrosLlamada = this._generarParametrosDeLlamada(ENDPOINTS.FILESYSTEMS);
+			L.d(['Realizando llamada al sistema KWEB', parametrosLlamada]);
 
 			request(parametrosLlamada, (errorLlamada, respuestaHttp, cuerpoHttp) => {
 
 				if (errorLlamada) {
 					L.e(['Ocurrió un error en la llamada al sistema Kweb', errorLlamada]);
+					this._hacerLogout();
 					callback(errorLlamada, null);
 					return;
 				}
 
 				if (respuestaHttp.statusCode !== 200) {
 					L.e(['La llamada no retornó un codigo de respuesta HTTP 200', respuestaHttp.statusCode]);
+					this._hacerLogout();
+					if (respuestaHttp.statusCode === 403) {
+						L.i(['Vamos a tratar de reautenticarnos ...']);
+						this.consultaFilesystems(callback);
+						return;
+					}
 					callback(new Error('KWeb retornó un error de respuesta: ' + respuestaHttp.statusCode), null);
 					return;
 				}
@@ -163,24 +198,32 @@ class ModeloDestinoKweb6 {
 
 	consultaTablespaces(callback) {
 
-		this._renovarCookieAutenticacion((errorAutenticacion, estoyAutenticado) => {
+		this._solicitarCookieAutenticacion((errorAutenticacion, estoyAutenticado) => {
 			if (errorAutenticacion) {
 				callback(errorAutenticacion, null);
 				return;
 			}
 
 			let parametrosLlamada = this._generarParametrosDeLlamada(ENDPOINTS.TABLESPACES);
+			L.d(['Realizando llamada al sistema KWEB', parametrosLlamada]);
 
 			request(parametrosLlamada, (errorLlamada, respuestaHttp, cuerpoHttp) => {
 
 				if (errorLlamada) {
 					L.e(['Ocurrió un error en la llamada al sistema Kweb', errorLlamada]);
+					this._hacerLogout();
 					callback(errorLlamada, null);
 					return;
 				}
 
 				if (respuestaHttp.statusCode !== 200) {
 					L.e(['La llamada no retornó un codigo de respuesta HTTP 200', respuestaHttp.statusCode]);
+					this._hacerLogout();
+					if (respuestaHttp.statusCode === 403) {
+						L.i(['Vamos a tratar de reautenticarnos ...']);
+						this.consultaTablespaces(callback);
+						return;
+					}
 					callback(new Error('KWeb retornó un error de respuesta: ' + respuestaHttp.statusCode), null);
 					return;
 				}
@@ -202,24 +245,32 @@ class ModeloDestinoKweb6 {
 	}
 
 	consultaEstaciones(callback) {
-		this._renovarCookieAutenticacion((errorAutenticacion, estoyAutenticado) => {
+		this._solicitarCookieAutenticacion((errorAutenticacion, estoyAutenticado) => {
 			if (errorAutenticacion) {
 				callback(errorAutenticacion, null);
 				return;
 			}
 
 			let parametrosLlamada = this._generarParametrosDeLlamada(ENDPOINTS.ESTACIONES);
+			L.d(['Realizando llamada al sistema KWEB', parametrosLlamada]);
 
 			request(parametrosLlamada, (errorLlamada, respuestaHttp, cuerpoHttp) => {
 
 				if (errorLlamada) {
 					L.e(['Ocurrió un error en la llamada al sistema Kweb', errorLlamada]);
+					this._hacerLogout();
 					callback(errorLlamada, null);
 					return;
 				}
 
 				if (respuestaHttp.statusCode !== 200) {
 					L.e(['La llamada no retornó un codigo de respuesta HTTP 200', respuestaHttp.statusCode]);
+					this._hacerLogout();
+					if (respuestaHttp.statusCode === 403) {
+						L.i(['Vamos a tratar de reautenticarnos ...']);
+						this.consultaEstaciones(callback);
+						return;
+					}
 					callback(new Error('KWeb retornó un error de respuesta: ' + respuestaHttp.statusCode), null);
 					return;
 				}
@@ -243,24 +294,32 @@ class ModeloDestinoKweb6 {
 	}
 
 	consultaTablas(callback) {
-		this._renovarCookieAutenticacion((errorAutenticacion, estoyAutenticado) => {
+		this._solicitarCookieAutenticacion((errorAutenticacion, estoyAutenticado) => {
 			if (errorAutenticacion) {
 				callback(errorAutenticacion, null);
 				return;
 			}
 
 			let parametrosLlamada = this._generarParametrosDeLlamada(ENDPOINTS.TABLAS);
+			L.d(['Realizando llamada al sistema KWEB', parametrosLlamada]);
 
 			request(parametrosLlamada, (errorLlamada, respuestaHttp, cuerpoHttp) => {
 
 				if (errorLlamada) {
 					L.e(['Ocurrió un error en la llamada al sistema Kweb', errorLlamada]);
+					this._hacerLogout();
 					callback(errorLlamada, null);
 					return;
 				}
 
 				if (respuestaHttp.statusCode !== 200) {
 					L.e(['La llamada no retornó un codigo de respuesta HTTP 200', respuestaHttp.statusCode]);
+					this._hacerLogout();
+					if (respuestaHttp.statusCode === 403) {
+						L.i(['Vamos a tratar de reautenticarnos ...']);
+						this.consultaTablas(callback);
+						return;
+					}
 					callback(new Error('KWeb retornó un error de respuesta: ' + respuestaHttp.statusCode), null);
 					return;
 				}
@@ -284,24 +343,32 @@ class ModeloDestinoKweb6 {
 	}
 
 	consultaCanales(callback) {
-		this._renovarCookieAutenticacion((errorAutenticacion, estoyAutenticado) => {
+		this._solicitarCookieAutenticacion((errorAutenticacion, estoyAutenticado) => {
 			if (errorAutenticacion) {
 				callback(errorAutenticacion, null);
 				return;
 			}
 
 			let parametrosLlamada = this._generarParametrosDeLlamada(ENDPOINTS.CANALES);
+			L.d(['Realizando llamada al sistema KWEB', parametrosLlamada]);
 
 			request(parametrosLlamada, (errorLlamada, respuestaHttp, cuerpoHttp) => {
 
 				if (errorLlamada) {
 					L.e(['Ocurrió un error en la llamada al sistema Kweb', errorLlamada]);
+					this._hacerLogout();
 					callback(errorLlamada, null);
 					return;
 				}
 
 				if (respuestaHttp.statusCode !== 200) {
 					L.e(['La llamada no retornó un codigo de respuesta HTTP 200', respuestaHttp.statusCode]);
+					this._hacerLogout();
+					if (respuestaHttp.statusCode === 403) {
+						L.i(['Vamos a tratar de reautenticarnos ...']);
+						this.consultaCanales(callback);
+						return;
+					}
 					callback(new Error('KWeb retornó un error de respuesta: ' + respuestaHttp.statusCode), null);
 					return;
 				}
@@ -325,24 +392,32 @@ class ModeloDestinoKweb6 {
 	}
 
 	consultaProcesos(callback) {
-		this._renovarCookieAutenticacion((errorAutenticacion, estoyAutenticado) => {
+		this._solicitarCookieAutenticacion((errorAutenticacion, estoyAutenticado) => {
 			if (errorAutenticacion) {
 				callback(errorAutenticacion, null);
 				return;
 			}
 
 			let parametrosLlamada = this._generarParametrosDeLlamada(ENDPOINTS.PROCESOS);
+			L.d(['Realizando llamada al sistema KWEB', parametrosLlamada]);
 
 			request(parametrosLlamada, (errorLlamada, respuestaHttp, cuerpoHttp) => {
 
 				if (errorLlamada) {
 					L.e(['Ocurrió un error en la llamada al sistema Kweb', errorLlamada]);
+					this._hacerLogout();
 					callback(errorLlamada, null);
 					return;
 				}
 
 				if (respuestaHttp.statusCode !== 200) {
 					L.e(['La llamada no retornó un codigo de respuesta HTTP 200', respuestaHttp.statusCode]);
+					this._hacerLogout();
+					if (respuestaHttp.statusCode === 403) {
+						L.i(['Vamos a tratar de reautenticarnos ...']);
+						this.consultaProcesos(callback);
+						return;
+					}
 					callback(new Error('KWeb retornó un error de respuesta: ' + respuestaHttp.statusCode), null);
 					return;
 				}
@@ -366,24 +441,32 @@ class ModeloDestinoKweb6 {
 	}
 
 	consultaTareas(callback) {
-		this._renovarCookieAutenticacion((errorAutenticacion, estoyAutenticado) => {
+		this._solicitarCookieAutenticacion((errorAutenticacion, estoyAutenticado) => {
 			if (errorAutenticacion) {
 				callback(errorAutenticacion, null);
 				return;
 			}
 
 			let parametrosLlamada = this._generarParametrosDeLlamada(ENDPOINTS.TAREAS);
+			L.d(['Realizando llamada al sistema KWEB', parametrosLlamada]);
 
 			request(parametrosLlamada, (errorLlamada, respuestaHttp, cuerpoHttp) => {
 
 				if (errorLlamada) {
 					L.e(['Ocurrió un error en la llamada al sistema Kweb', errorLlamada]);
+					this._hacerLogout();
 					callback(errorLlamada, null);
 					return;
 				}
 
 				if (respuestaHttp.statusCode !== 200) {
 					L.e(['La llamada no retornó un codigo de respuesta HTTP 200', respuestaHttp.statusCode]);
+					this._hacerLogout();
+					if (respuestaHttp.statusCode === 403) {
+						L.i(['Vamos a tratar de reautenticarnos ...']);
+						this.consultaTareas(callback);
+						return;
+					}
 					callback(new Error('KWeb retornó un error de respuesta: ' + respuestaHttp.statusCode), null);
 					return;
 				}
