@@ -23,7 +23,7 @@ class RespuestaTablespaces {
 		return [
 			{
 				"Channel": this.nombre,
-				"Value": this.estado === 'ok' ? '1' : '0',
+				"Value": this.estado === 'ok' ? '1' : '2',
 				"Unit": "Custom",
 				"ValueLookup": 'prtg.standardlookups.yesno.stateyesok'
 			}
