@@ -1,6 +1,6 @@
 'use strict';
-const C = global.config;
-const L = global.logger;
+//const C = global.config;
+//const L = global.logger;
 
 
 class ErrorPRTG {
@@ -11,6 +11,8 @@ class ErrorPRTG {
 
 	formatoPRTG() {
 		return {
+			ok: false,
+			error: this.mensaje,
 			prtg: {
 				error: 1,
 				text: this.mensaje

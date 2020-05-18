@@ -86,8 +86,9 @@ module.exports = (app) => {
 
 	/* Middleware que se ejecuta tras no haberse hecho matching con ninguna ruta. */
 	app.use((req, res, next) => {
+		let errorPRTG = new errorPRTG('no existe la ruta');
 		L.w(['Se descarta la transmisión porque el endpoint no existe', req.originalUrl]);
-		res.status(404).json({ok: false, error: 'No existe la ruta'});
+		res.status(404).json(errorPRTG);
 	});
 
 };
