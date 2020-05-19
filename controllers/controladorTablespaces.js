@@ -15,14 +15,14 @@ const consultaTablespaces = (req, res) => {
 	let destinoKweb = DestinoKweb.desdeNombre(nombreDestinoKweb);
 
 	if (!destinoKweb) {
-		L.e(['No existe el destino Kweb indicado', nombreDestinoKweb]);
+		L.e(['No existe el destino Kweb indicado', nombreDestinoKweb], destinoKweb.nombre);
 		res.status(404).json({ ok: false, error: 'No existe el desino Kweb indicado' });
 		return;
 	}
 
 	destinoKweb.consultaTablespaces((errorConsulta, tablespaces) => {
 		if (errorConsulta) {
-			L.e(['Ocurrió un error al consultar los tablespaces', errorConsulta]);
+			L.e(['Ocurrió un error al consultar los tablespaces', errorConsulta], destinoKweb.nombre);
 			res.status(500).json({ ok: false, error: errorConsulta });
 		} else {
 			res.status(200).json({ ok: true, datos: tablespaces });
@@ -40,7 +40,7 @@ const consultaTablespacesPRTG = (req, res) => {
 	let destinoKweb = DestinoKweb.desdeNombre(nombreDestinoKweb);
 
 	if (!destinoKweb) {
-		L.e(['No existe el destino Kweb indicado', nombreDestinoKweb]);
+		L.e(['No existe el destino Kweb indicado', nombreDestinoKweb], destinoKweb.nombre);
 		let errorPRTG = new ErrorPRTG('No existe el destino Kweb indicado')
 		res.status(404).json(errorPRTG.formatoPRTG());
 		return;
@@ -48,7 +48,7 @@ const consultaTablespacesPRTG = (req, res) => {
 
 	destinoKweb.consultaTablespaces((errorConsulta, tablespaces) => {
 		if (errorConsulta) {
-			L.e(['Ocurrió un error al consultar los tablespaces', errorConsulta]);
+			L.e(['Ocurrió un error al consultar los tablespaces', errorConsulta], destinoKweb.nombre);
 			let errorPRTG = new ErrorPRTG(errorConsulta.message)
 			res.status(500).json(errorPRTG.formatoPRTG());
 			return

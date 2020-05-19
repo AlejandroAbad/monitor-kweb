@@ -15,14 +15,14 @@ const consultaFilesystems = (req, res) => {
 	let destinoKweb = DestinoKweb.desdeNombre(nombreDestinoKweb);
 
 	if (!destinoKweb) {
-		L.e(['No existe el destino Kweb indicado', nombreDestinoKweb]);
+		L.e(['No existe el destino Kweb indicado', nombreDestinoKweb], destinoKweb.nombre);
 		res.status(404).json({ ok: false, error: 'No existe el desino Kweb indicado' });
 		return;
 	}
 
 	destinoKweb.consultaFilesystems((errorConsulta, filesystems) => {
 		if (errorConsulta) {
-			L.e(['Ocurrió un error al consultar los filesystems', errorConsulta]);
+			L.e(['Ocurrió un error al consultar los filesystems', errorConsulta], destinoKweb.nombre);
 			res.status(500).json({ ok: false, error: errorConsulta });
 		} else {
 			res.status(200).json({ ok: true, datos: filesystems });
@@ -39,7 +39,7 @@ const consultaFilesystemsPRTG = (req, res) => {
 	let destinoKweb = DestinoKweb.desdeNombre(nombreDestinoKweb);
 
 	if (!destinoKweb) {
-		L.e(['No existe el destino Kweb indicado', nombreDestinoKweb]);
+		L.e(['No existe el destino Kweb indicado', nombreDestinoKweb], destinoKweb.nombre);
 		let errorPRTG = new ErrorPRTG('No existe el desino Kweb indicado');
 		res.status(404).json(errorPRTG.formatoPRTG());
 		return;
@@ -47,7 +47,7 @@ const consultaFilesystemsPRTG = (req, res) => {
 
 	destinoKweb.consultaFilesystems((errorConsulta, filesystems) => {
 		if (errorConsulta) {
-			L.e(['Ocurrió un error al consultar los filesystems', errorConsulta]);
+			L.e(['Ocurrió un error al consultar los filesystems', errorConsulta], destinoKweb.nombre);
 			let errorPRTG = new ErrorPRTG(errorConsulta.message);
 			res.status(500).json(errorPRTG.formatoPRTG());
 			return;

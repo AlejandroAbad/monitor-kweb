@@ -11,7 +11,7 @@ const listadoDestinosKweb = (req, res) => {
 
 // GET /destinos/:nombreDestino
 const consultaDestinoKweb = (req, res) => {
-	L.i(['Consulta de destino KWEB', req.params.nombreDestino]);
+	L.i(['Consulta de destino KWEB', req.params.nombreDestino], destinoKweb.nombre);
 	res.status(200).json({ ok: true, datos: C.destinos[req.params.nombreDestino] });
 }
 
