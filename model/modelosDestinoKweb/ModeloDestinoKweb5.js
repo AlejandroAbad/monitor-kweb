@@ -195,6 +195,12 @@ class ModeloDestinoKweb5 {
 					match = REGEX.FILESYSTEMS.exec(cuerpoHttp);
 				}
 
+				// En KWEB v5, en ocasiones se le va la pinza y empieza a devolver listas vacías.
+				// forzamos logout si se da el caso.
+				if (!filesystems.length) {
+					this._hacerLogout();
+				}
+
 				callback(null, filesystems);
 			})
 		})
@@ -243,6 +249,12 @@ class ModeloDestinoKweb5 {
 					match = REGEX.TABLESPACES.exec(cuerpoHttp);
 				}
 
+				// En KWEB v5, en ocasiones se le va la pinza y empieza a devolver listas vacías.
+				// forzamos logout si se da el caso.
+				if (!tablespaces.length) {
+					this._hacerLogout();
+				}
+
 				callback(null, tablespaces);
 			})
 		})
@@ -282,14 +294,18 @@ class ModeloDestinoKweb5 {
 				cuerpoHttp = cuerpoHttp.replace(/\n/g, '');
 				let match = REGEX.ESTACIONES.exec(cuerpoHttp);
 
-
-
 				let estaciones = [];
 
 				while (match != null) {
 					let respuestaEstacion = new RespuestaEstacion(match);
 					estaciones.push(respuestaEstacion);
 					match = REGEX.ESTACIONES.exec(cuerpoHttp);
+				}
+
+				// En KWEB v5, en ocasiones se le va la pinza y empieza a devolver listas vacías.
+				// forzamos logout si se da el caso.
+				if (!estaciones.length) {
+					this._hacerLogout();
 				}
 
 				callback(null, estaciones);
@@ -331,14 +347,18 @@ class ModeloDestinoKweb5 {
 				cuerpoHttp = cuerpoHttp.replace(/\n/g, '');
 				let match = REGEX.TABLAS.exec(cuerpoHttp);
 
-
-
 				let tablas = [];
 
 				while (match != null) {
 					let respuestaTabla = new RespuestaTabla(match);
 					tablas.push(respuestaTabla);
 					match = REGEX.TABLAS.exec(cuerpoHttp);
+				}
+
+				// En KWEB v5, en ocasiones se le va la pinza y empieza a devolver listas vacías.
+				// forzamos logout si se da el caso.
+				if (!tablas.length) {
+					this._hacerLogout();
 				}
 
 				callback(null, tablas);
@@ -380,14 +400,18 @@ class ModeloDestinoKweb5 {
 				cuerpoHttp = cuerpoHttp.replace(/\n/g, '');
 				let match = REGEX.CANALES.exec(cuerpoHttp);
 
-
-
 				let canales = [];
 
 				while (match != null) {
 					let respuestaCanal = new RespuestaCanal(match);
 					canales.push(respuestaCanal);
 					match = REGEX.CANALES.exec(cuerpoHttp);
+				}
+
+				// En KWEB v5, en ocasiones se le va la pinza y empieza a devolver listas vacías.
+				// forzamos logout si se da el caso.
+				if (!canales.length) {
+					this._hacerLogout();
 				}
 
 				callback(null, canales);
@@ -429,14 +453,18 @@ class ModeloDestinoKweb5 {
 				cuerpoHttp = cuerpoHttp.replace(/\n/g, '');
 				let match = REGEX.PROCESOS.exec(cuerpoHttp);
 
-
-
 				let procesos = [];
 
 				while (match != null) {
 					let respuestaProceso = new RespuestaProceso(match);
 					procesos.push(respuestaProceso);
 					match = REGEX.PROCESOS.exec(cuerpoHttp);
+				}
+
+				// En KWEB v5, en ocasiones se le va la pinza y empieza a devolver listas vacías.
+				// forzamos logout si se da el caso.
+				if (!procesos.length) {
+					this._hacerLogout();
 				}
 
 				callback(null, procesos);
